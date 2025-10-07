@@ -1,8 +1,6 @@
-# payments/api/views.py
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 from requests.auth import HTTPBasicAuth
 from django.conf import settings
 import requests
@@ -43,6 +41,7 @@ class C2BPaymentRequestView(APIView):
     """
     Request payment from a SasaPay user (C2B)
     """
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         url = f"{settings.SASAPAY_BASE_URL}/payments/request-payment/"
@@ -90,6 +89,7 @@ class C2BPaymentRequestView(APIView):
         }, status=response.status_code)
     
 class ProcessPayment(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         url = f"{settings.SASAPAY_BASE_URL}/payments/process-payment/"
@@ -134,6 +134,7 @@ class C2BPaymentMobileMoneyRequestView(APIView):
     """
     Request payment from a SasaPay user (C2B) for mobile money
     """
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         url = f'{settings.SASAPAY_BASE_URL}/payments/request-payment/'
@@ -282,6 +283,7 @@ class IPNView(APIView):
         )
 
 class B2CPaymentRequestView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         url = f"{settings.SASAPAY_BASE_URL}/payments/b2c/"
@@ -343,6 +345,7 @@ class B2CPaymentRequestView(APIView):
             )
         
 class B2BPaymentRequestView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         url = f"{settings.SASAPAY_BASE_URL}/payments/b2b/"
@@ -406,6 +409,7 @@ class B2BPaymentRequestView(APIView):
             )
         
 class ChannelCodesView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
 
@@ -434,6 +438,7 @@ class ChannelCodesView(APIView):
             }, status=status.HTTP_200_OK)
     
 class CheckoutView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         url = f"{settings.SASAPAY_BASE_URL}/payments/card-payments/"
@@ -505,6 +510,7 @@ class CheckoutView(APIView):
             )
 
 class RemittancePaymentView(APIView):
+    # permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         url = f"{settings.SASAPAY_BASE_URL}/remittances/remittance-payments/"
