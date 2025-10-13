@@ -5,6 +5,8 @@ from requests.auth import HTTPBasicAuth
 from django.conf import settings
 import requests
 
+
+
 class SasapayAuthView(APIView):
 
     def post(self, request):
@@ -233,7 +235,7 @@ class C2BCallbackView(APIView):
             message = f"Transaction failed: {result_desc}"
 
         return Response(
-            {"status": True, "message": message},
+            {"status": True, "message": message, "data": data},
             status=status.HTTP_200_OK,
         )
 
@@ -278,7 +280,7 @@ class IPNView(APIView):
             )
 
         return Response(
-            {"status": True, "message": "IPN received successfully"},
+            {"status": True, "message": "IPN received successfully", "data": data},
             status=status.HTTP_200_OK
         )
 

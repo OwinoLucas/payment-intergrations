@@ -7,6 +7,8 @@ urlpatterns = [
     path("c2bpayment/", C2BPaymentRequestView.as_view(), name="c2b"),
     path("process-payment/", ProcessPayment.as_view(), name="process-payment"),
     path("c2b-mobile/", C2BPaymentMobileMoneyRequestView.as_view(), name="c2b-mobile-money"),
+
+
     path("c2b-callback/", C2BCallbackView.as_view(), name="c2b-callback"),
     path("sasapay/ipn/", IPNView.as_view(), name="sasapay-ipn"),
 

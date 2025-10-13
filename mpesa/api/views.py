@@ -252,8 +252,8 @@ class B2CPaymentView(APIView):
         
         payload = {
             "OriginatorConversationID": request.data.get("OriginatorConversationID"),
-            "InitiatorName": request.data.get("InitiatorName"),
-            "SecurityCredential": request.data.get("SecurityCredential"),
+            "InitiatorName": settings.MPESA_INITIATOR_NAME,
+            "SecurityCredential": settings.MPESA_SECURITY_CREDENTIALS,
             "CommandID": request.data.get("CommandID"),
             "Amount": request.data.get("Amount"),
             "PartyA": request.data.get("PartyA"),
@@ -261,8 +261,13 @@ class B2CPaymentView(APIView):
             "Remarks": request.data.get("Remarks"),
             "QueueTimeOutURL": request.data.get("QueueTimeOutURL"),
             "ResultURL": request.data.get("ResultURL"),
-            "Occassion": request.data.get("Occassion")
+            "Occassion": request.data.get("Occassion"),
+            "ResponseType": request.data.get("ResponseType"),
+            "ValidationURL": request.data.get("ValidationURL"),
+            "ConfirmationURL": request.data.get("ConfirmationURL"),
+            "ShortCode": settings.SHORT_CODE
         }
+        print("PAYLOAD: ",payload)
 
         payload = {x: v for x, v in payload.items() if v is not None}
 
@@ -274,6 +279,7 @@ class B2CPaymentView(APIView):
         try:
             response = requests.post(url, headers=headers, json=payload)
             res_data = response.json()
+            print("res_data",res_data)
 
             if not response.ok:
                 return Response(
@@ -299,6 +305,79 @@ class B2CPaymentView(APIView):
                 {
                     "status": False,
                     "message": f"B2C transaction failed: {str(e)}"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class TransactionStatusView(APIView):
+
+    def post(self, request):
+        url = f"{settings.MPESA_BASE_URL}/mpesa/transactionstatus/v1/query"
+
+        access_token = request.headers.get("Authorization")
+        if not access_token:
+            return Response(
+                {
+                    "status": False,
+                    "message": "Missing Authorization header (Bearer token required)"
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        payload = {
+            "Initiator": settings.MPESA_INITIATOR_NAME,
+            "SecurityCredential": settings.MPESA_SECURITY_CREDENTIALS,
+            "CommandID": request.data.get("Command ID"),
+            "TransactionID": request.data.get("Transaction ID"),
+            "OriginatorConversationID": request.data.get("OriginatorConversationID"),
+            "PartyA": request.data.get("PartyA"),
+            "IdentifierType": request.data.get("IdentifierType"),
+            "ResultURL": request.data.get("ResultURL"),
+            "QueueTimeOutURL": request.data.get("QueueTimeOutURL"),
+            "Remarks": request.data.get("Remarks"),
+            "Occassion": request.data.get("Occassion"),
+            # "ResponseType": request.data.get("ResponseType"),
+            # "ValidationURL": request.data.get("ValidationURL"),
+            # "ConfirmationURL": request.data.get("ConfirmationURL"),
+            # "ShortCode": settings.SHORT_CODE
+        }
+        print("PAYLOAD: ",payload)
+
+        payload = {x: v for x, v in payload.items() if v is not None}
+
+        headers = {
+            "Authorization": access_token,
+            "Content-Type": "application/json"
+        }
+
+        try:
+            response = requests.post(url, headers=headers, json=payload)
+            res_data = response.json()
+            print("res_data",res_data)
+
+            if not response.ok:
+                return Response(
+                    {
+                        "status": False,
+                        "message": "Transaction status check unsuccessful",
+                        "data": res_data
+                    },
+                    status=response.status_code
+                )
+
+            return Response(
+                {
+                    "status": True,
+                    "message": "Transaction status check.",
+                    "data": res_data
+                },
+                status=response.status_code
+            )
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": f"Transaction status check failed: {str(e)}"
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

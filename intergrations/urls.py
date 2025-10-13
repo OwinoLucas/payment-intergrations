@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('flutterwave/v1/', include('flutterwave.api.urls')),
     path('mpesa/v1/', include('mpesa.api.urls')),
-    path('sasapay/v1/', include('sasapay.api.urls'))
+    path('sasapay/v1/', include('sasapay.api.urls')),
+    path('sasapay-tz/v1/', include('sasapay_tz.api.urls'))
 ]
