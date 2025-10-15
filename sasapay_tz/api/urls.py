@@ -11,9 +11,12 @@ urlpatterns = [
     path("ifm/", InternalFundMovement.as_view(), name="ifm"),
 
     path("b2c-tz/", B2CPaymentRequestView.as_view(), name="b2c"),
-    path("b2b-tz/", B2BPaymentRequestView.as_view(), name="b2b")
+    path("b2b-tz/", B2BPaymentRequestView.as_view(), name="b2b"),
 
+    path("account-validation/", AccountValidationView.as_view(), name="acc-validation"),
+    path("transaction-status/", TransactionStatusView.as_view(), name="transaction-status"),
   
+    path("account-balance/", MerchantAccBalanceView.as_view(), name="acc-bal")
 
 
 ]

@@ -384,4 +384,171 @@ class B2BPaymentRequestView(APIView):
             )
         
 
+class AccountValidationView(APIView):
 
+    def post(self, request):
+        url = f'{settings.SASAPAY_TZ_BASE_URL}/accounts/account-validation/'
+
+        access_token = request.headers.get("Authorization")
+        
+        if not access_token:
+            return Response(
+                {
+                    "status": False,
+                    "message": "Missing Authorization header (Bearer token required)"
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        payload = {
+            "merchant_code": request.data.get("merchant_code"),
+            "channel_code": request.data.get("channel_code"),
+            "account_number": request.data.get("account_number"),
+        }  
+
+        headers = {
+            "Authorization": access_token,
+            "Content-Type": "application/json"
+        }
+
+        try:
+            response = requests.post(url, headers=headers, json=payload)
+            resp_data = response.json()
+             
+            if not response.ok:
+                return Response(
+                    {
+                        "status": False,
+                        "message": "Account Validation Failed",
+                        "data": resp_data
+                    },
+                    status=response.status_code
+                )
+            return Response(
+                {
+                    "status": True,
+                    "message": "Account Validation successful.",
+                    "data": resp_data
+                },
+                status=response.status_code
+            )
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": f"Account Validation failed: {str(e)}"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+class TransactionStatusView(APIView):
+
+    def post(self, request):
+        url = f'{settings.SASAPAY_TZ_BASE_URL}/transactions/status-query/'
+
+        access_token = request.headers.get("Authorization")
+        if not access_token:
+            return Response(
+                {
+                    "status": True,
+                    "message": ""
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        payload = {
+            "MerchantCode": request.data.get("MerchantCode"),
+            "CheckoutRequestId": request.data.get("CheckoutRequestId"),
+            "MerchantTransactionReference": request.data.get("MerchantTransactionReference"),
+            "TransactionCode": request.data.get("TransactionCode"),
+            "CallbackUrl": request.data.get("CallbackUrl")
+        }
+
+        headers = {
+            "Authorization": access_token,
+            "Content-Type": "application/json"        
+        }
+
+        try:
+            response = requests.post(url, headers=headers, json=payload)
+            resp_data = response.json()
+             
+            if not response.ok:
+                return Response(
+                    {
+                        "status": False,
+                        "message": "Transaction Status Failed",
+                        "data": resp_data
+                    },
+                    status=response.status_code
+                )
+            return Response(
+                {
+                    "status": True,
+                    "message": "Transaction Status successful.",
+                    "data": resp_data
+                },
+                status=response.status_code
+            )
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": f"Transaction Status failed: {str(e)}"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+class MerchantAccBalanceView(APIView):
+
+    def get(self, request):
+        url = f'{settings.SASAPAY_TZ_BASE_URL}/payments/check-balance/'
+
+        access_token = request.headers.get("Authorization")
+        if not access_token:
+            return Response(
+                {
+                    "status": True,
+                    "message": ""
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        params = {
+            "MerchantCode": request.query_params.get("MerchantCode"),
+        }
+
+        headers = {
+            "Authorization": access_token,
+            "Content-Type": "application/json"        
+        }
+
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            resp_data = response.json()
+             
+            if not response.ok:
+                return Response(
+                    {
+                        "status": False,
+                        "message": "Account balance fetch Failed",
+                        "data": resp_data
+                    },
+                    status=response.status_code
+                )
+            return Response(
+                {
+                    "status": True,
+                    "message": "Account balance fetch successful.",
+                    "data": resp_data
+                },
+                status=response.status_code
+            )
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {
+                    "status": False,
+                    "message": f"Account balance fetch failed: {str(e)}"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
